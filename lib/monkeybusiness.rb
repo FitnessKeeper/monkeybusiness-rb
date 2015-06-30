@@ -11,13 +11,14 @@ require 'timeliness'
 require 'zlib'
 
 require 'monkeybusiness/components'
+require 'monkeybusiness/worker'
 require 'monkeybusiness/version'
 
-module Monkeybusiness
-  def self.run
+module MonkeyBusiness
+  def self.run(survey_id)
     begin
       today = Time.now
-      yesterday = Monkeybusiness::Worker.previous_day(today)
+      yesterday = MonkeyBusiness::Worker.previous_day(today)
 
       # write out survey table headers
       MonkeyBusiness::SurveyRow.write!(MonkeyBusiness::SurveyRow.headers, MonkeyBusiness::SurveyRow.default_outfile)
@@ -33,9 +34,7 @@ module Monkeybusiness
       target_respondents = ['4025256245']
       # target_respondents = []
 
-      worker = Monkeybusiness::Worker.new
-
-      worker.process_surveys(target_survey, yesterday, target_questions, target_respondents)
+      MonkeyBusiness::Worker.new(survey_id, yesterday, target_questions, target_respondents).process_surveys
 
       # upload compressed archives to S3
       s3_prefix = 'test'
@@ -46,7 +45,8 @@ module Monkeybusiness
 
       # import to Redshift
       connection_string = sprintf("postgres://%s:%s@%s:%s/%s", 'rkevents', 'uHEahL73ZQbZKcicNXWG', 'localhost', '5439', 'rkevents')
-      MonkeyBusiness::SurveyQuestionRow.dbimport(connection_string, s3_prefix)
+      connection_params = { client_min_messages: false, force_standard_strings: false }
+      MonkeyBusiness::SurveyQuestionRow.dbimport(connection_string, connection_params, s3_prefix)
 
     rescue StandardError => e
       raise e

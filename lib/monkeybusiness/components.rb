@@ -3,7 +3,7 @@ require 'monkeybusiness/monkeytime'
 require 'monkeybusiness/monkeyaws'
 require 'monkeybusiness/monkeysql'
 
-module Monkeybusiness
+module MonkeyBusiness
 
   include MonkeyBusiness::MonkeyLogging
   include MonkeyBusiness::MonkeyTime
@@ -346,11 +346,11 @@ module Monkeybusiness
       end
     end
 
-    def self.dbimport(db_connection, prefix = (self.s3_prefix || ''), outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
+    def self.dbimport(db_connection, db_params = {}, prefix = (self.s3_prefix || ''), outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
       begin
         @log = Logging.logger[self]
 
-        db = MonkeyBusiness::MonkeySQL::DBClient.new(db_connection)
+        db = MonkeyBusiness::MonkeySQL::DBClient.new(db_connection, db_params)
 
         key = sprintf("%s/%s.gz", prefix, File.basename(outfile))
 
@@ -389,7 +389,7 @@ module Monkeybusiness
       'title',
     ]
 
-    Outfile = File.join('.', 'survey.csv')
+    Outfile = File.join('.', 'tmp', 'survey.csv')
 
     property :fields, default: Fields
     property :outfile, default: Outfile
@@ -422,7 +422,7 @@ module Monkeybusiness
       'custom_variable_label',
     ]
 
-    Outfile = File.join('.', 'survey_question.csv')
+    Outfile = File.join('.', 'tmp', 'survey_question.csv')
 
     property :fields, default: Fields
     property :outfile, default: Outfile
@@ -472,7 +472,7 @@ module Monkeybusiness
       'visible',
     ]
 
-    Outfile = File.join('.', 'survey_response_option.csv')
+    Outfile = File.join('.', 'tmp', 'survey_response_option.csv')
 
     property :fields, default: Fields
     property :outfile, default: Outfile
@@ -523,7 +523,7 @@ module Monkeybusiness
       'response_time',
     ]
 
-    Outfile = File.join('.', 'survey_response.csv')
+    Outfile = File.join('.', 'tmp', 'survey_response.csv')
 
     property :fields, default: Fields
     property :outfile, default: Outfile

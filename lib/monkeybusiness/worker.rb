@@ -74,7 +74,7 @@ module MonkeyBusiness
 
     end
 
-    def process_surveys(survey_id = nil, date = nil, question_ids = [], respondent_ids = [])
+    def process_surveys(survey_id = self.survey_id, date = self.date, question_ids = self.question_ids, respondent_ids = self.respondent_ids)
       log = Logging.logger[__method__]
       log.level = :debug
 
@@ -194,6 +194,10 @@ module MonkeyBusiness
       end
     end
 
+    def previous_day(input)
+      self.class.send(:previous_day, input)
+    end
+
     def self.date_meridian(input)
       begin
         case input
@@ -210,6 +214,10 @@ module MonkeyBusiness
       end
     end
 
+    def date_meridian(input)
+      self.class.send(:date_meridian, input)
+    end
+
     def self.date_params(method_params, start_date = nil, end_date = nil, start_key = 'start_date', end_key = 'end_date')
       begin
         if ( start_date.nil? or end_date.nil? )
@@ -222,5 +230,10 @@ module MonkeyBusiness
         raise e
       end
     end
+
+    def date_params(method_params, start_date = nil, end_date = nil, start_key = 'start_date', end_key = 'end_date')
+      self.class.send(:date_params, method_params, start_date = nil, end_date = nil, start_key = 'start_date', end_key = 'end_date')
+    end
+
   end
 end
