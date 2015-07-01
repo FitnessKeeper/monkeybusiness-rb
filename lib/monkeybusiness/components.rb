@@ -252,6 +252,10 @@ module MonkeyBusiness
       self.const_get(:Outfile) || ''
     end
 
+    def self.default_s3_prefix
+      ''
+    end
+
     def self.default_s3_bucket
       MonkeyBusiness::MonkeyAWS::S3_Bucket.to_s || ''
     end
@@ -346,11 +350,11 @@ module MonkeyBusiness
       end
     end
 
-    def self.dbimport(db_connection, db_params = {}, prefix = (self.s3_prefix || ''), outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
+    def self.dbimport(prefix = self.default_s3_prefix, db_params = {}, outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
       begin
         @log = Logging.logger[self]
 
-        db = MonkeyBusiness::MonkeySQL::DBClient.new(db_connection, db_params)
+        db = MonkeyBusiness::MonkeySQL::DBClient.new(db_params)
 
         key = sprintf("%s/%s.gz", prefix, File.basename(outfile))
 

@@ -28,11 +28,11 @@ module MonkeyBusiness
 
 
       target_survey = '61225411'
-      # target_questions = ['762673420' ]
+      target_questions = ['762673420' ]
       # target_questions = ['762673420', '762667811' ]
-      target_questions = []
-      # target_respondents = ['4025256245']
-      target_respondents = []
+      #target_questions = []
+      target_respondents = ['4025256245']
+      #target_respondents = []
 
       MonkeyBusiness::Worker.new(survey_id, yesterday, target_questions, target_respondents).process_surveys
 
@@ -46,7 +46,7 @@ module MonkeyBusiness
       # import to Redshift
       connection_string = sprintf("postgres://%s:%s@%s:%s/%s", 'rkevents', 'uHEahL73ZQbZKcicNXWG', 'localhost', '5439', 'rkevents')
       connection_params = { client_min_messages: false, force_standard_strings: false }
-      MonkeyBusiness::SurveyResponseRow.dbimport(connection_string, connection_params, s3_prefix)
+      MonkeyBusiness::SurveyResponseRow.dbimport('test', connection_params)
 
     rescue StandardError => e
       raise e
