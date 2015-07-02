@@ -15,10 +15,9 @@ require 'monkeybusiness/worker'
 require 'monkeybusiness/version'
 
 module MonkeyBusiness
-  def self.run(survey_id)
+  def self.run(survey_id, end_date = Time.now)
     begin
-      today = Time.now
-      yesterday = MonkeyBusiness::Worker.previous_day(today)
+      start_date = MonkeyBusiness::Worker.previous_day(end_date)
 
       # write out survey table headers
       MonkeyBusiness::SurveyRow.write!(MonkeyBusiness::SurveyRow.headers, MonkeyBusiness::SurveyRow.default_outfile)
@@ -28,25 +27,25 @@ module MonkeyBusiness
 
 
       target_survey = '61225411'
-      target_questions = ['762673420' ]
+      #target_questions = ['762673420' ]
       # target_questions = ['762673420', '762667811' ]
-      #target_questions = []
-      target_respondents = ['4025256245']
-      #target_respondents = []
+      target_questions = []
+      #target_respondents = ['4036697566']
+      target_respondents = []
 
-      MonkeyBusiness::Worker.new(survey_id, yesterday, target_questions, target_respondents).process_surveys
+      MonkeyBusiness::Worker.new(survey_id, end_date, target_questions, target_respondents).process_surveys
 
       # upload compressed archives to S3
       s3_prefix = 'test'
-      MonkeyBusiness::SurveyRow.upload(s3_prefix)
-      MonkeyBusiness::SurveyQuestionRow.upload(s3_prefix)
-      MonkeyBusiness::SurveyResponseOptionRow.upload(s3_prefix)
-      MonkeyBusiness::SurveyResponseRow.upload(s3_prefix)
+      #MonkeyBusiness::SurveyRow.upload(s3_prefix)
+      #MonkeyBusiness::SurveyQuestionRow.upload(s3_prefix)
+      #MonkeyBusiness::SurveyResponseOptionRow.upload(s3_prefix)
+      #MonkeyBusiness::SurveyResponseRow.upload(s3_prefix)
 
       # import to Redshift
       connection_string = sprintf("postgres://%s:%s@%s:%s/%s", 'rkevents', 'uHEahL73ZQbZKcicNXWG', 'localhost', '5439', 'rkevents')
       connection_params = { client_min_messages: false, force_standard_strings: false }
-      MonkeyBusiness::SurveyResponseRow.dbimport('test', connection_params)
+      MonkeyBusiness::SurveyResponseRow.dbimport(survey_id, 'test', connection_params)
 
     rescue StandardError => e
       raise e

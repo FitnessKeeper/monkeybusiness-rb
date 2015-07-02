@@ -252,6 +252,10 @@ module MonkeyBusiness
       self.const_get(:Outfile) || ''
     end
 
+    def self.default_table
+      self.const_get(:Table) || ''
+    end
+
     def self.default_s3_prefix
       ''
     end
@@ -350,7 +354,7 @@ module MonkeyBusiness
       end
     end
 
-    def self.dbimport(prefix = self.default_s3_prefix, db_params = {}, outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
+    def self.dbimport(survey_id, prefix = self.default_s3_prefix, db_params = {}, outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
       begin
         @log = Logging.logger[self]
 
@@ -358,7 +362,7 @@ module MonkeyBusiness
 
         key = sprintf("%s/%s.gz", prefix, File.basename(outfile))
 
-        db.import_from_s3(self.name, bucket, key)
+        db.import_from_s3(self, survey_id, bucket, key)
 
       rescue StandardError => e
         binding.pry
@@ -379,6 +383,7 @@ module MonkeyBusiness
     property :fields, required: true, default: []
     property :outfile, required: true
     property :written, default: nil
+    property :table, default: nil
     property :aws_region, required: true, default: self.default_aws_region
     property :s3_bucket, required: true, default: self.default_s3_bucket
     property :s3_prefix, required: true, default: ''
@@ -394,6 +399,8 @@ module MonkeyBusiness
     ]
 
     Outfile = File.join('.', 'tmp', 'survey.csv')
+
+    Table = 'survey'
 
     property :fields, default: Fields
     property :outfile, default: Outfile
@@ -427,6 +434,8 @@ module MonkeyBusiness
     ]
 
     Outfile = File.join('.', 'tmp', 'survey_question.csv')
+
+    Table = 'survey_question'
 
     property :fields, default: Fields
     property :outfile, default: Outfile
@@ -478,6 +487,8 @@ module MonkeyBusiness
 
     Outfile = File.join('.', 'tmp', 'survey_response_option.csv')
 
+    Table = 'survey_response_option'
+
     property :fields, default: Fields
     property :outfile, default: Outfile
     property :response_option_id, required: true, from: :answer_id
@@ -528,6 +539,8 @@ module MonkeyBusiness
     ]
 
     Outfile = File.join('.', 'tmp', 'survey_response.csv')
+
+    Table = 'survey_response'
 
     property :fields, default: Fields
     property :outfile, default: Outfile

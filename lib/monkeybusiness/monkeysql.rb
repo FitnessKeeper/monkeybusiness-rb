@@ -6,11 +6,23 @@ module MonkeyBusiness
 
   module MonkeySQL
     # constants
-    Import_Queries = {
-      'MonkeyBusiness::SurveyQuestionRow'       => "COPY survey_question (survey_id, question_id, heading, position, family_type, subtype) FROM :s3_path CREDENTIALS :credentials DELIMITER :delimiter MAXERROR 100 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :timeformat",
-      'MonkeyBusiness::SurveyResponseOptionRow' => "copy survey_response_option (question_id, response_option_id, position, text, type, visible) from :s3_path CREDENTIALS :credentials delimiter :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 timeformat :timeformat",
-      'MonkeyBusiness::SurveyResponseRow'       => "copy survey_response (survey_id, question_id, response_col, response_row, response_text, userid, custom_id, response_time) from :s3_path CREDENTIALS :credentials delimiter :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 timeformat :timeformat",
-      'MonkeyBusiness::SurveyRow'               => "copy survey (survey_id, language_id, nickname, title) from :s3_path CREDENTIALS :credentials delimiter :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 timeformat :timeformat",
+    Queries = {
+      'MonkeyBusiness::SurveyQuestionRow' => {
+        'copy' => 'COPY survey_question (survey_id, question_id, heading, position, family_type, subtype) FROM :s3_path CREDENTIALS :credentials DELIMITER :DELIMITER MAXERROR 100 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :TIMEFORMAT',
+        'delete' => 'DELETE FROM survey_question WHERE survey_id = :survey_id',
+      },
+      'MonkeyBusiness::SurveyResponseOptionRow' => {
+        'copy' => 'COPY survey_response_option (question_id, response_option_id, position, text, type, visible) FROM :s3_path CREDENTIALS :credentials DELIMITER :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :timeformat',
+        'delete' => 'DELETE FROM survey_response_option WHERE question_id = :question_id',
+      },
+      'MonkeyBusiness::SurveyResponseRow' => {
+        'copy' => 'COPY survey_response (survey_id, question_id, response_col, response_row, response_text, userid, custom_id, response_time) FROM :s3_path CREDENTIALS :credentials DELIMITER :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :timeformat',
+        'delete' => 'DELETE FROM survey_response WHERE survey_id = :survey_id',
+      },
+      'MonkeyBusiness::SurveyRow' => {
+        'copy' => 'COPY survey (survey_id, language_id, nickname, title) FROM :s3_path CREDENTIALS :credentials DELIMITER :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :timeformat',
+        'delete' => 'DELETE FROM survey WHERE survey_id = :survey_id',
+      }
     }
 
     Access_Key = ENV.fetch('SURVEYMONKEY_ACCESS_KEY', '')
@@ -29,7 +41,7 @@ module MonkeyBusiness
     class DBClient
       attr_accessor :sequel
 
-      def import_from_s3(target_class, bucket, key, access_key = MonkeyBusiness::MonkeySQL::Access_Key, secret_key = MonkeyBusiness::MonkeySQL::Secret_Key, queries = MonkeyBusiness::MonkeySQL::Import_Queries)
+      def import_from_s3(target, survey_id, bucket, key, access_key = MonkeyBusiness::MonkeySQL::Access_Key, secret_key = MonkeyBusiness::MonkeySQL::Secret_Key, queries = MonkeyBusiness::MonkeySQL::Queries)
         begin
           s3_path = build_s3_path(bucket, key)
 
@@ -39,16 +51,22 @@ module MonkeyBusiness
 
           timeformat = build_timeformat
 
-          query = queries.fetch(target_class)
+          copy_query = queries[target.name]['copy']
+          delete_query = queries[target.name]['delete']
 
-          self.sequel.fetch(query, :s3_path => s3_path, :credentials => credentials, :delimiter => delimiter, :timeformat => timeformat).all
+          table = target.default_table
+
+          self.sequel.transaction do
+            ds = self.sequel[delete_query, :survey_id => survey_id].delete
+            self.sequel.fetch(copy_query, :s3_path => s3_path, :credentials => credentials, :delimiter => delimiter, :timeformat => timeformat).all
+          end
 
         rescue KeyError => e
-          @log.error sprintf("no query found for class '%s'", target_class)
+          @log.error sprintf("%s: no query found for class '%s'", __method__, target_class)
           raise e
 
         rescue StandardError => e
-          @log.error sprintf("error: %s", e.message)
+          @log.error sprintf("%s: error: %s", __method__, e.message)
           raise e
 
         end
@@ -58,14 +76,14 @@ module MonkeyBusiness
 
       def build_s3_path(bucket, key)
         s3_path = sprintf("s3://%s/%s", bucket, key)
-        @log.debug sprintf("s3_path: %s", s3_path)
+        @log.debug sprintf("%s: s3_path: %s", __method__, s3_path)
 
         s3_path
       end
 
       def build_credentials(access_key, secret_key)
         credentials = sprintf("aws_access_key_id=%s;aws_secret_access_key=%s", access_key, secret_key)
-        @log.debug sprintf("credentials: %s", credentials)
+        @log.debug sprintf("%s: credentials: %s", __method__, credentials)
 
         credentials
       end

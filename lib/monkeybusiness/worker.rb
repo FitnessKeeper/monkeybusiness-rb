@@ -105,9 +105,9 @@ module MonkeyBusiness
           # get the respondents
           log.debug sprintf("getting respondents for survey %s", survey)
           if respondent_ids.length == 0
-            respondents = get_respondents(survey, start_date, end_date)
+            respondents = get_respondents(survey, start_date = nil, end_date = nil)
           else
-            respondents = get_respondents(survey, start_date, end_date, respondents = respondent_ids)
+            respondents = get_respondents(survey, start_date = nil, end_date = nil, respondents = respondent_ids)
           end
 
           # process the survey responses
