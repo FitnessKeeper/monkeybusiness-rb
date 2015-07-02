@@ -1,12 +1,10 @@
 require 'monkeybusiness/monkeylogging'
-require 'monkeybusiness/monkeytime'
 require 'monkeybusiness/monkeyaws'
 require 'monkeybusiness/monkeysql'
 
 module MonkeyBusiness
 
   include MonkeyBusiness::MonkeyLogging
-  include MonkeyBusiness::MonkeyTime
   include MonkeyBusiness::MonkeyAWS
   include MonkeyBusiness::MonkeySQL
 
@@ -354,7 +352,7 @@ module MonkeyBusiness
       end
     end
 
-    def self.dbimport(survey_id, prefix = self.default_s3_prefix, db_params = {}, outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
+    def self.dbimport(survey_id, prefix = self.default_s3_prefix, db_params = {}, clobber = true, outfile = self.default_outfile, bucket = self.default_s3_bucket, region = self.default_aws_region)
       begin
         @log = Logging.logger[self]
 
@@ -362,7 +360,7 @@ module MonkeyBusiness
 
         key = sprintf("%s/%s.gz", prefix, File.basename(outfile))
 
-        db.import_from_s3(self, survey_id, bucket, key)
+        db.import_from_s3(self, survey_id, bucket, key, clobber)
 
       rescue StandardError => e
         binding.pry

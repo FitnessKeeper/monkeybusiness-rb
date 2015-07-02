@@ -15,14 +15,13 @@ require 'monkeybusiness/worker'
 require 'monkeybusiness/version'
 
 module MonkeyBusiness
-  def self.run(survey_id, s3_prefix = 'monkeybusiness')
+  def self.run(survey_id, initial = false, target_questions = [], target_respondents = [], s3_prefix = 'monkeybusiness')
     begin
       # write out survey table headers
       MonkeyBusiness::SurveyRow.write!(MonkeyBusiness::SurveyRow.headers, MonkeyBusiness::SurveyRow.default_outfile)
       MonkeyBusiness::SurveyQuestionRow.write!(MonkeyBusiness::SurveyQuestionRow.headers, MonkeyBusiness::SurveyQuestionRow.default_outfile)
       MonkeyBusiness::SurveyResponseOptionRow.write!(MonkeyBusiness::SurveyResponseOptionRow.headers, MonkeyBusiness::SurveyResponseOptionRow.default_outfile)
       MonkeyBusiness::SurveyResponseRow.write!(MonkeyBusiness::SurveyResponseRow.headers, MonkeyBusiness::SurveyResponseRow.default_outfile)
-
 
       prefixed_path = File.join(s3_prefix, survey_id)
 
@@ -37,6 +36,12 @@ module MonkeyBusiness
       # import to Redshift
       connection_params = { client_min_messages: false, force_standard_strings: false }
       MonkeyBusiness::SurveyResponseRow.dbimport(survey_id, prefixed_path, connection_params)
+
+      if initial
+        MonkeyBusiness::SurveyRow.dbimport(survey_id, prefixed_path, connection_params)
+        MonkeyBusiness::SurveyQuestionRow.dbimport(survey_id, prefixed_path, connection_params, false)
+        MonkeyBusiness::SurveyResponseOptionRow.dbimport(survey_id, prefixed_path, connection_params)
+      end
 
     rescue StandardError => e
       raise e

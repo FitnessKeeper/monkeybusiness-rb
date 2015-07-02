@@ -41,8 +41,12 @@ module MonkeyBusiness
     class DBClient
       attr_accessor :sequel
 
-      def import_from_s3(target, survey_id, bucket, key, access_key = MonkeyBusiness::MonkeySQL::Access_Key, secret_key = MonkeyBusiness::MonkeySQL::Secret_Key, queries = MonkeyBusiness::MonkeySQL::Queries)
+      def import_from_s3(target, survey_id, bucket, key, clobber = true, access_key = MonkeyBusiness::MonkeySQL::Access_Key, secret_key = MonkeyBusiness::MonkeySQL::Secret_Key, queries = MonkeyBusiness::MonkeySQL::Queries)
         begin
+          target_name = target.name
+
+          @log.info sprintf("%s: importing %s for survey_id %s", __method__, target_name, survey_id)
+
           s3_path = build_s3_path(bucket, key)
 
           credentials = build_credentials(access_key, secret_key)
@@ -51,19 +55,22 @@ module MonkeyBusiness
 
           timeformat = build_timeformat
 
-          copy_query = queries[target.name]['copy']
-          delete_query = queries[target.name]['delete']
+          copy_query = queries[target_name]['copy']
+          delete_query = queries[target_name]['delete']
 
           table = target.default_table
 
-          self.sequel.transaction do
-            ds = self.sequel[delete_query, :survey_id => survey_id].delete
+          if clobber
+            @log.info sprintf("%s: clobbering existing %s rows matching survey_id %s", __method__, table, survey_id)
+            self.sequel.transaction do
+              ds = self.sequel[delete_query, :survey_id => survey_id].delete
+            end
           end
 
           self.sequel.fetch(copy_query, :s3_path => s3_path, :credentials => credentials, :delimiter => delimiter, :timeformat => timeformat).all
 
         rescue KeyError => e
-          @log.error sprintf("%s: no query found for class '%s'", __method__, target_class)
+          @log.error sprintf("%s: no query found for class '%s'", __method__, target_name)
           raise e
 
         rescue StandardError => e
