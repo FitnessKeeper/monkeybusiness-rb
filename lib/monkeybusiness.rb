@@ -4,7 +4,7 @@ require 'date'
 require 'hashie'
 require 'logging'
 require 'pp'
-require 'pry-plus'
+require 'pry'
 require 'sequel'
 require 'surveymonkey'
 require 'timeliness'
@@ -15,10 +15,8 @@ require 'monkeybusiness/worker'
 require 'monkeybusiness/version'
 
 module MonkeyBusiness
-  def self.run(survey_id, end_date = Time.now)
+  def self.run(survey_id, s3_prefix = 'monkeybusiness')
     begin
-      start_date = MonkeyBusiness::Worker.previous_day(end_date)
-
       # write out survey table headers
       MonkeyBusiness::SurveyRow.write!(MonkeyBusiness::SurveyRow.headers, MonkeyBusiness::SurveyRow.default_outfile)
       MonkeyBusiness::SurveyQuestionRow.write!(MonkeyBusiness::SurveyQuestionRow.headers, MonkeyBusiness::SurveyQuestionRow.default_outfile)
@@ -26,26 +24,19 @@ module MonkeyBusiness
       MonkeyBusiness::SurveyResponseRow.write!(MonkeyBusiness::SurveyResponseRow.headers, MonkeyBusiness::SurveyResponseRow.default_outfile)
 
 
-      target_survey = '61225411'
-      #target_questions = ['762673420' ]
-      # target_questions = ['762673420', '762667811' ]
-      target_questions = []
-      #target_respondents = ['4036697566']
-      target_respondents = []
+      prefixed_path = File.join(s3_prefix, survey_id)
 
-      MonkeyBusiness::Worker.new(survey_id, end_date, target_questions, target_respondents).process_surveys
+      MonkeyBusiness::Worker.new(survey_id, target_questions, target_respondents).process_surveys
 
       # upload compressed archives to S3
-      s3_prefix = 'test'
-      #MonkeyBusiness::SurveyRow.upload(s3_prefix)
-      #MonkeyBusiness::SurveyQuestionRow.upload(s3_prefix)
-      #MonkeyBusiness::SurveyResponseOptionRow.upload(s3_prefix)
-      #MonkeyBusiness::SurveyResponseRow.upload(s3_prefix)
+      MonkeyBusiness::SurveyRow.upload(prefixed_path)
+      MonkeyBusiness::SurveyQuestionRow.upload(prefixed_path)
+      MonkeyBusiness::SurveyResponseOptionRow.upload(prefixed_path)
+      MonkeyBusiness::SurveyResponseRow.upload(prefixed_path)
 
       # import to Redshift
-      connection_string = sprintf("postgres://%s:%s@%s:%s/%s", 'rkevents', 'uHEahL73ZQbZKcicNXWG', 'localhost', '5439', 'rkevents')
       connection_params = { client_min_messages: false, force_standard_strings: false }
-      MonkeyBusiness::SurveyResponseRow.dbimport(survey_id, 'test', connection_params)
+      MonkeyBusiness::SurveyResponseRow.dbimport(survey_id, prefixed_path, connection_params)
 
     rescue StandardError => e
       raise e

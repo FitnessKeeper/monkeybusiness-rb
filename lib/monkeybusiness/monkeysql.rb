@@ -58,8 +58,9 @@ module MonkeyBusiness
 
           self.sequel.transaction do
             ds = self.sequel[delete_query, :survey_id => survey_id].delete
-            self.sequel.fetch(copy_query, :s3_path => s3_path, :credentials => credentials, :delimiter => delimiter, :timeformat => timeformat).all
           end
+
+          self.sequel.fetch(copy_query, :s3_path => s3_path, :credentials => credentials, :delimiter => delimiter, :timeformat => timeformat).all
 
         rescue KeyError => e
           @log.error sprintf("%s: no query found for class '%s'", __method__, target_class)

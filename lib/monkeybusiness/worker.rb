@@ -8,10 +8,9 @@ module MonkeyBusiness
   class Worker
     attr_accessor :date, :survey_id, :question_ids, :respondent_ids
 
-    def initialize(survey_id, date = nil, question_ids = [], respondent_ids = [])
+    def initialize(survey_id, question_ids = [], respondent_ids = [])
       begin
         @survey_id = survey_id
-        @date = date
         @question_ids = question_ids
         @respondent_ids = respondent_ids
 
@@ -28,7 +27,7 @@ module MonkeyBusiness
       end
     end
 
-    def get_responses(survey, respondents, start_date = nil, end_date = nil)
+    def get_responses(survey, respondents)
       @log = Logging.logger[__method__]
       @log.level = :debug
 
@@ -46,7 +45,7 @@ module MonkeyBusiness
       end
 
       response_bundles.each do |bundle|
-        method_params = date_params({'survey_id' => survey.survey_id, 'respondent_ids' => bundle}, start_date, end_date)
+        method_params = {'survey_id' => survey.survey_id, 'respondent_ids' => bundle}
 
         response_bundle = Surveymonkey.get_responses('method_params' => method_params)
 
@@ -58,11 +57,11 @@ module MonkeyBusiness
 
     end
 
-    def get_respondents(survey, start_date = nil, end_date = nil, respondents = [])
+    def get_respondents(survey, respondents = [])
       @log = Logging.logger[__method__]
       @log.level = :debug
 
-      method_params = date_params({'survey_id' => survey.survey_id, 'fields' => ['date_start', 'date_modified', 'custom_id']}, start_date, end_date, 'start_modified_date', 'end_modified_date')
+      method_params = {'survey_id' => survey.survey_id, 'fields' => ['date_start', 'date_modified', 'custom_id']}
 
       respondent_list = Surveymonkey.get_respondent_list(method_params).fetch('data', {}).fetch('respondents', [])
 
@@ -74,7 +73,7 @@ module MonkeyBusiness
 
     end
 
-    def process_surveys(survey_id = self.survey_id, date = self.date, question_ids = self.question_ids, respondent_ids = self.respondent_ids)
+    def process_surveys(survey_id = self.survey_id, question_ids = self.question_ids, respondent_ids = self.respondent_ids)
       log = Logging.logger[__method__]
       log.level = :debug
 
@@ -83,15 +82,6 @@ module MonkeyBusiness
           surveys = get_surveys
         else
           surveys = [{'survey_id' => survey_id}]
-        end
-
-        if date.nil?
-          start_date = nil
-          end_date = nil
-        else
-          end_date = date_meridian(previous_day(Surveymonkey::DateString.new(date).to_s))
-          start_date = date_meridian(previous_day(end_date))
-          log.debug sprintf("start_date %s, end_date %s", start_date, end_date)
         end
 
         surveys.each do |survey_id|
@@ -105,14 +95,14 @@ module MonkeyBusiness
           # get the respondents
           log.debug sprintf("getting respondents for survey %s", survey)
           if respondent_ids.length == 0
-            respondents = get_respondents(survey, start_date = nil, end_date = nil)
+            respondents = get_respondents(survey)
           else
-            respondents = get_respondents(survey, start_date = nil, end_date = nil, respondents = respondent_ids)
+            respondents = get_respondents(survey, respondents = respondent_ids)
           end
 
           # process the survey responses
           log.debug sprintf("getting responses for survey %s", survey)
-          responses = get_responses(survey, respondents, start_date, end_date)
+          responses = get_responses(survey, respondents)
 
           if question_ids.length == 0
             the_questions = survey.questions
