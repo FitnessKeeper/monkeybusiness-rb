@@ -1,10 +1,26 @@
 # Monkeybusiness
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/monkeybusiness`. To experiment with that code, run `bin/console` for an interactive prompt.
+This gem contains the SurveyMonkey import worker, for use in RunKeeper ETL.  This code can operate independently of other code in the existing ETL codebase; as such, you can run this just as well from your workstation as from the production ETL system.
 
-TODO: Delete this and the text above, and describe your gem
+This gem is not published in public gem repositories; if you want to use it in your code, getting it there is your business.
+
+## Prerequisites
+
+This worker requires the following:
+
+1. SurveyMonkey [API credentials](https://developer.surveymonkey.com/)
+2. AWS credentials with access to the SessionSense exports bucket
+3. Network access to production Redshift
+
+The worker is configured via environment variables.  The file `dotenv-sample` contains a listing of all the variables that must be set in order for the worker to run; there are doubtless other variables that also affect its operation.
 
 ## Installation
+
+### Standalone
+
+From your local Git repository, run `bin/setup` to install the gem's dependencies and see a sample application configuration.  Write this configuration in `.env` in the top level of the repository.
+
+### Ruby
 
 Add this line to your application's Gemfile:
 
@@ -12,25 +28,33 @@ Add this line to your application's Gemfile:
 gem 'monkeybusiness'
 ```
 
-And then execute:
+Again, since this Gem is not public, you'll have to install it yourself.  `rake install` from the top level of the Git repository will do the trick.
 
-    $ bundle
+### Scala
 
-Or install it yourself as:
-
-    $ gem install monkeybusiness
+TODO: figure this out
 
 ## Usage
 
-TODO: Write usage instructions here
+### Standalone
 
-## Development
+Run `bin/console` to get an interactive prompt; you can then invoke the runner as documented in the Ruby section below.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+    $ ./bin/console
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+    Frame number: 0/0
+    [1] pry(main)>
 
-## Contributing
+### Ruby
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/monkeybusiness. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+The gem's namespace is `MonkeyBusiness`; for convenience, there's a class method `run` that takes a SurveyMonkey survey ID:
 
+```ruby
+MonkeyBusiness.run('12345678')
+```
+
+Beware of running too many workers concurrently; SurveyMonkey imposes a limit on the number of API calls per second that varies depending on your account tier, and the `surveymonkey` client gem is not smart enough to keep track of how close you are to the limit.
+
+### Scala
+
+TODO: figure this out

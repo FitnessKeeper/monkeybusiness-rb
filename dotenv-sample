@@ -1,3 +1,5 @@
+export MONKEYBUSINESS_LOGFILE='/tmp/monkeybusiness.log'
+
 export SURVEYMONKEY_APIKEY='<SurveyMonkey API key>'
 export SURVEYMONKEY_ACCESSTOKEN='<SurveyMonkey API access token'
 export SURVEYMONKEY_ACCESS_KEY='<AWS Access Key for Redshift import>'
