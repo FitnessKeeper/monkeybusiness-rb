@@ -34,9 +34,9 @@ module MonkeyBusiness
     Driver = ENV.fetch('REDSHIFT_DRIVER', 'postgres')
     Host   = ENV.fetch('REDSHIFT_HOST', 'localhost')
     Port   = ENV.fetch('REDSHIFT_PORT', '5489')
-    User   = ENV.fetch('REDSHIFT_USER', 'rkevents')
+    User   = ENV.fetch('REDSHIFT_USER', '')
     Pass   = ENV.fetch('REDSHIFT_PASS', '')
-    DB     = ENV.fetch('REDSHIFT_DB', 'rkevents')
+    DB     = ENV.fetch('REDSHIFT_DB', '')
 
     class DBClient
       attr_accessor :sequel
