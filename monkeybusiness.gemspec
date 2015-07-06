@@ -31,14 +31,14 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "aws-sdk", "~> 2"
   spec.add_runtime_dependency "hashie", "~> 3.4"
   spec.add_runtime_dependency "logging", "~> 2"
-  spec.add_runtime_dependency "pg", "~> 0.18"
   spec.add_runtime_dependency "sequel", "~> 4"
   spec.add_runtime_dependency "surveymonkey", "~> 0.4"
   spec.add_runtime_dependency "timeliness", "~> 0.3"
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "dotenv", "~> 2"
-  spec.add_development_dependency "pry-plus", "~> 1"
+  spec.add_development_dependency "pry", "~> 0.10"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec"
+  spec.add_development_dependency "warbler", ">= 1.4.8", "~> 1.4"
 end

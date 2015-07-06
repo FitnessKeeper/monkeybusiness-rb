@@ -16,9 +16,13 @@ The worker is configured via environment variables.  The file `dotenv-sample` co
 
 ## Installation
 
+__NOTE__ You will have to install the appropriate DB driver for your platform!
+
 ### Standalone
 
 From your local Git repository, run `bin/setup` to install the gem's dependencies and see a sample application configuration.  Write this configuration in `.env` in the top level of the repository.
+
+Install the `sequel_pg` gem (`gem install sequel_pg`) and configure `REDSHIFT_DRIVER=postgres`.
 
 ### Ruby
 
@@ -26,11 +30,16 @@ Add this line to your application's Gemfile:
 
 ```ruby
 gem 'monkeybusiness'
+gem 'sequel_pg', '~> 1.6'
 ```
 
 Again, since this Gem is not public, you'll have to install it yourself.  `rake install` from the top level of the Git repository will do the trick.
 
+Make sure to configure `REDSHIFT_DRIVER=postgres`.
+
 ### Scala
+
+Install the `jdbc-postgresql` gem (`gem install jdbc-postgresql`) and configure `REDSHIFT_DRIVER=jdbc:postgresql`.
 
 TODO: figure this out
 

@@ -8,7 +8,4 @@ Dotenv.load
 require "monkeybusiness"
 
 require "pry"
-require "pry-debugger"
-require "pry-doc"
-require "bond"
 Pry.start

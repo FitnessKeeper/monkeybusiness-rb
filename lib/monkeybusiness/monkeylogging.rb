@@ -25,7 +25,7 @@ module MonkeyBusiness
                                :level => :info
                               )
 
-      Logging.logger.root.level = :error
+      Logging.logger.root.level = :debug
       Logging.logger.root.add_appenders(
         'STDERR',
         'SYSLOG'
@@ -44,12 +44,12 @@ module MonkeyBusiness
       end
 
       # set per-class logging
-      Logging.logger['MonkeyBusiness::SurveyRow'].level               = :info
-      Logging.logger['MonkeyBusiness::SurveyQuestionRow'].level       = :info
-      Logging.logger['MonkeyBusiness::SurveyResponseOptionRow'].level = :info
-      Logging.logger['MonkeyBusiness::SurveyResponseRow'].level       = :info
-      Logging.logger['MonkeyBusiness::MonkeyAWS::S3Client'].level     = :info
-      Logging.logger['MonkeyBusiness::MonkeySQL::DBClient'].level     = :info
+      Logging.logger['MonkeyBusiness::SurveyRow'].level               = :debug
+      Logging.logger['MonkeyBusiness::SurveyQuestionRow'].level       = :debug
+      Logging.logger['MonkeyBusiness::SurveyResponseOptionRow'].level = :debug
+      Logging.logger['MonkeyBusiness::SurveyResponseRow'].level       = :debug
+      Logging.logger['MonkeyBusiness::MonkeyAWS::S3Client'].level     = :debug
+      Logging.logger['MonkeyBusiness::MonkeySQL::DBClient'].level     = :debug
 
     rescue StandardError => e
       puts "unable to configure logging: #{e.message}"

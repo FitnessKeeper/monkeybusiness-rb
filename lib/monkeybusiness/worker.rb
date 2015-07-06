@@ -20,10 +20,15 @@ module MonkeyBusiness
     end
 
     def get_survey_details(survey_id = self.survey_id)
-      response = Surveymonkey.get_survey_details('method_params' => survey_id)
+      begin
+        response = Surveymonkey.get_survey_details({'method_params' => survey_id})
 
-      if response['status'] == 0
-        MonkeyBusiness::Survey.new(response.fetch('data'))
+        if response['status'] == 0
+          MonkeyBusiness::Survey.new(response.fetch('data'))
+        end
+      rescue StandardError => e
+        binding.pry
+        raise e
       end
     end
 

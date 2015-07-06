@@ -7,6 +7,7 @@ export SURVEYMONKEY_SECRET_KEY='<AWS Secret Key for Redshift import>'
 export SURVEYMONKEY_LOGLEVEL='info'
 
 export AWS_REGION='us-east-1'
+export REDSHIFT_DRIVER='<Sequel server>'
 export REDSHIFT_HOST='<Redshift DB server>'
 export REDSHIFT_PASS='<Redshift password>'
 export REDSHIFT_PORT='5439'
