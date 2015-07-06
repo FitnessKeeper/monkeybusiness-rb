@@ -18,16 +18,16 @@ module MonkeyBusiness
   def self.run(survey_id, initial = false, target_questions = [], target_respondents = [], s3_prefix = 'monkeybusiness')
     begin
       # write out survey table headers
-      MonkeyBusiness::SurveyRow.write!(MonkeyBusiness::SurveyRow.headers, MonkeyBusiness::SurveyRow.default_outfile)
-      MonkeyBusiness::SurveyQuestionRow.write!(MonkeyBusiness::SurveyQuestionRow.headers, MonkeyBusiness::SurveyQuestionRow.default_outfile)
-      MonkeyBusiness::SurveyResponseOptionRow.write!(MonkeyBusiness::SurveyResponseOptionRow.headers, MonkeyBusiness::SurveyResponseOptionRow.default_outfile)
-      MonkeyBusiness::SurveyResponseRow.write!(MonkeyBusiness::SurveyResponseRow.headers, MonkeyBusiness::SurveyResponseRow.default_outfile)
-
-      prefixed_path = File.join(s3_prefix, survey_id)
+      MonkeyBusiness::SurveyRow.write!(MonkeyBusiness::SurveyRow.headers, MonkeyBusiness::SurveyRow.default_outfile, true)
+      MonkeyBusiness::SurveyQuestionRow.write!(MonkeyBusiness::SurveyQuestionRow.headers, MonkeyBusiness::SurveyQuestionRow.default_outfile, true)
+      MonkeyBusiness::SurveyResponseOptionRow.write!(MonkeyBusiness::SurveyResponseOptionRow.headers, MonkeyBusiness::SurveyResponseOptionRow.default_outfile, true)
+      MonkeyBusiness::SurveyResponseRow.write!(MonkeyBusiness::SurveyResponseRow.headers, MonkeyBusiness::SurveyResponseRow.default_outfile, true)
 
       MonkeyBusiness::Worker.new(survey_id, target_questions, target_respondents).process_surveys
 
       # upload compressed archives to S3
+      prefixed_path = File.join(s3_prefix, survey_id)
+
       MonkeyBusiness::SurveyRow.upload(prefixed_path)
       MonkeyBusiness::SurveyQuestionRow.upload(prefixed_path)
       MonkeyBusiness::SurveyResponseOptionRow.upload(prefixed_path)

@@ -291,9 +291,11 @@ module MonkeyBusiness
       end
     end
 
-    def self.write!(csv = self.to_csv, outfile = self.outfile)
+    def self.write!(csv = self.to_csv, outfile = self.outfile, clobber = false)
       begin
-        File.open(outfile, mode="a") do |csvfile|
+        filemode = clobber ? 'w' : 'a'
+
+        File.open(outfile, mode = filemode) do |csvfile|
           csvfile << csv
         end
 
@@ -305,7 +307,7 @@ module MonkeyBusiness
       end
     end
 
-    def write(csv = self.class.to_csv(self.field_values), outfile = self.outfile)
+    def write(csv = self.class.to_csv(self.field_values), outfile = self.outfile, clobber = false)
       begin
         @log.info sprintf("preparing to write row '%s' to '%s'", self, outfile)
 
@@ -313,7 +315,7 @@ module MonkeyBusiness
           @log.info sprintf("row '%s' has already been already written", self)
           return true
         else
-          self.class.write!(csv, outfile)
+          self.class.write!(csv, outfile, clobber)
           self.written = true
 
         end
