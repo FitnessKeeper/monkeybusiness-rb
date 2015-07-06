@@ -10,8 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["steve.huff@runkeeper.com"]
 
   spec.summary       = %q{SurveyMonkey ETL worker}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.description   = %q{Ruby component of SurveyMonkey ETL worker.}
 
   # This gem is not for public consumption
   spec.metadata      = { 'allowed_push_host' => 'localhost' }
