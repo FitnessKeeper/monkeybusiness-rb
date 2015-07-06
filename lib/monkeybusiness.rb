@@ -23,6 +23,7 @@ module MonkeyBusiness
       MonkeyBusiness::SurveyResponseOptionRow.write!(MonkeyBusiness::SurveyResponseOptionRow.headers, MonkeyBusiness::SurveyResponseOptionRow.default_outfile, true)
       MonkeyBusiness::SurveyResponseRow.write!(MonkeyBusiness::SurveyResponseRow.headers, MonkeyBusiness::SurveyResponseRow.default_outfile, true)
 
+      # download the survey data
       MonkeyBusiness::Worker.new(survey_id, target_questions, target_respondents).process_surveys
 
       # upload compressed archives to S3
