@@ -20,7 +20,6 @@ module MonkeyBusiness
 
         @log = Logging.logger[self]
 
-
       rescue StandardError => e
         raise e
       end

@@ -1,7 +1,6 @@
 module MonkeyBusiness
   module MonkeyLogging
     begin
-
       # configure logging
       Logging.color_scheme( 'bright',
         :levels => {
