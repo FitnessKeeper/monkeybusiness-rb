@@ -302,7 +302,6 @@ module MonkeyBusiness
         outfile
 
       rescue StandardError => e
-        @log.error sprintf("unable to write row '%s': %s", self, e.message)
         raise e
       end
     end
