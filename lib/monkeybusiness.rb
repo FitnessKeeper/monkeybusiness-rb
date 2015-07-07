@@ -35,13 +35,12 @@ module MonkeyBusiness
       MonkeyBusiness::SurveyResponseRow.upload(prefixed_path)
 
       # import to Redshift
-      connection_params = { client_min_messages: false, force_standard_strings: false }
-      MonkeyBusiness::SurveyResponseRow.dbimport(survey_id, prefixed_path, connection_params)
+      MonkeyBusiness::SurveyResponseRow.dbimport(survey_id, prefixed_path)
 
       if initial
-        MonkeyBusiness::SurveyRow.dbimport(survey_id, prefixed_path, connection_params)
-        MonkeyBusiness::SurveyQuestionRow.dbimport(survey_id, prefixed_path, connection_params, false)
-        MonkeyBusiness::SurveyResponseOptionRow.dbimport(survey_id, prefixed_path, connection_params)
+        MonkeyBusiness::SurveyRow.dbimport(survey_id, prefixed_path)
+        MonkeyBusiness::SurveyQuestionRow.dbimport(survey_id, prefixed_path, {}, false)
+        MonkeyBusiness::SurveyResponseOptionRow.dbimport(survey_id, prefixed_path)
       end
 
     rescue StandardError => e

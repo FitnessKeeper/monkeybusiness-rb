@@ -8,20 +8,20 @@ module MonkeyBusiness
     # constants
     Queries = {
       'MonkeyBusiness::SurveyQuestionRow' => {
-        'copy' => 'COPY survey_question (survey_id, question_id, heading, position, family_type, subtype) FROM :s3_path CREDENTIALS :credentials DELIMITER :DELIMITER MAXERROR 100 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :TIMEFORMAT',
-        'delete' => 'DELETE FROM survey_question WHERE survey_id = :survey_id',
+        'copy' => 'COPY survey_question (survey_id, question_id, heading, position, family_type, subtype) FROM ? CREDENTIALS ? DELIMITER ? MAXERROR 100 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT ?',
+        'delete' => 'DELETE FROM survey_question WHERE survey_id = ?',
       },
       'MonkeyBusiness::SurveyResponseOptionRow' => {
-        'copy' => 'COPY survey_response_option (question_id, response_option_id, position, text, type, visible) FROM :s3_path CREDENTIALS :credentials DELIMITER :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :timeformat',
+        'copy' => 'COPY survey_response_option (question_id, response_option_id, position, text, type, visible) FROM ? CREDENTIALS ? DELIMITER ? MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT ?',
         'delete' => 'DELETE FROM survey_response_option WHERE question_id = :question_id',
       },
       'MonkeyBusiness::SurveyResponseRow' => {
-        'copy' => 'COPY survey_response (survey_id, question_id, response_col, response_row, response_text, userid, custom_id, response_time) FROM :s3_path CREDENTIALS :credentials DELIMITER :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :timeformat',
-        'delete' => 'DELETE FROM survey_response WHERE survey_id = :survey_id',
+        'copy' => 'COPY survey_response (survey_id, question_id, response_col, response_row, response_text, userid, custom_id, response_time) FROM ? CREDENTIALS ? DELIMITER ? MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT ?',
+        'delete' => 'DELETE FROM survey_response WHERE survey_id = ?',
       },
       'MonkeyBusiness::SurveyRow' => {
-        'copy' => 'COPY survey (survey_id, language_id, nickname, title) FROM :s3_path CREDENTIALS :credentials DELIMITER :delimiter MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT :timeformat',
-        'delete' => 'DELETE FROM survey WHERE survey_id = :survey_id',
+        'copy' => 'COPY survey (survey_id, language_id, nickname, title) FROM ? CREDENTIALS ? DELIMITER ? MAXERROR 1 GZIP REMOVEQUOTES IGNOREHEADER 1 TIMEFORMAT ?',
+        'delete' => 'DELETE FROM survey WHERE survey_id = ?',
       }
     }
 
@@ -39,7 +39,7 @@ module MonkeyBusiness
     DB     = ENV.fetch('REDSHIFT_DB', '')
 
     class DBClient
-      attr_accessor :sequel
+      attr_accessor :connection_string, :connection_params, :sequel
 
       def import_from_s3(target, survey_id, bucket, key, clobber = true, access_key = MonkeyBusiness::MonkeySQL::Access_Key, secret_key = MonkeyBusiness::MonkeySQL::Secret_Key, queries = MonkeyBusiness::MonkeySQL::Queries)
         begin
@@ -61,11 +61,18 @@ module MonkeyBusiness
 
           if clobber
             self.sequel.transaction do
-              ds = self.sequel[delete_query, :survey_id => survey_id].delete
+              ds = self.sequel[delete_query, survey_id].delete
             end
           end
 
-          self.sequel.fetch(copy_query, :s3_path => s3_path, :credentials => credentials, :delimiter => delimiter, :timeformat => timeformat).all
+          self.sequel.fetch(copy_query, s3_path, credentials, delimiter, timeformat).all
+
+        rescue Sequel::DatabaseError => e
+          if e.wrapped_exception.message == 'No results were returned by the query.'
+            # it's OK for the COPY command to return no results
+          else
+            raise e
+          end
 
         rescue KeyError => e
           raise e
@@ -100,7 +107,13 @@ module MonkeyBusiness
 
       def build_connection_string(driver = MonkeySQL::Driver, host = MonkeySQL::Host, port = MonkeySQL::Port, user = MonkeySQL::User, pass = MonkeySQL::Pass, db = MonkeySQL::DB)
         begin
-          sprintf("%s://%s:%s@%s:%s/%s", driver, user, pass, host, port, db)
+          connection_string = sprintf("%s://%s:%s/%s?user=%s&password=%s", driver, host, port, db, user, pass)
+
+          if driver =~ /^jdbc:postgres/
+            connection_string.concat('&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory')
+          else
+            connection_string
+          end
 
         rescue StandardError => e
           raise e
@@ -110,11 +123,18 @@ module MonkeyBusiness
       def initialize(connection_params = {}, connection_string = build_connection_string)
         begin
           @log = Logging.logger[self]
+          @connection_string = connection_string
 
-          default_params = { loggers: [@log], sslmode: 'require' }
+          default_params = {
+            loggers: [@log],
+            sslmode: 'require',
+            client_min_messages: false,
+            force_standard_strings: false,
+          }
 
           merged_params = default_params.merge(connection_params)
 
+          @connection_params = merged_params
 
           @sequel = Sequel.connect(connection_string, merged_params)
 
