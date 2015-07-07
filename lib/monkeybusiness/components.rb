@@ -20,7 +20,6 @@ module MonkeyBusiness
 
         @log = Logging.logger[self]
 
-        @log.debug(sprintf("%s: %s", __method__, attributes.inspect))
 
       rescue StandardError => e
         raise e
@@ -143,7 +142,6 @@ module MonkeyBusiness
         @log = Logging.logger[self]
         @log.level = :warn
 
-        @log.debug(sprintf("%s", self.inspect))
       rescue StandardError => e
         raise e
       end
@@ -164,7 +162,6 @@ module MonkeyBusiness
         @log = Logging.logger[self]
         @log.level = :debug
 
-        @log.debug(sprintf("%s: %i respondents", self.survey, respondents.length))
       rescue StandardError => e
         raise e
       end
@@ -277,7 +274,6 @@ module MonkeyBusiness
         end
 
       rescue StandardError => e
-        @log.error sprintf("unable to format as CSV: %s", e.message)
         raise e
       end
     end
@@ -308,10 +304,8 @@ module MonkeyBusiness
 
     def write(csv = self.class.to_csv(self.field_values), outfile = self.outfile, clobber = false)
       begin
-        @log.info sprintf("preparing to write row '%s' to '%s'", self, outfile)
 
         if self.written?
-          @log.info sprintf("row '%s' has already been already written", self)
           return true
         else
           self.class.write!(csv, outfile, clobber)
@@ -320,7 +314,6 @@ module MonkeyBusiness
         end
 
       rescue StandardError => e
-        @log.error sprintf("failed attempt to write row '%s': %s", self, e.message)
         raise e
       end
     end
@@ -415,7 +408,6 @@ module MonkeyBusiness
         @log = Logging.logger[self]
 
       rescue StandardError => e
-        @log.error sprintf("initialization failed: %s", e.message)
         raise e
       end
     end
@@ -455,19 +447,15 @@ module MonkeyBusiness
 
         # get the survey_id from the survey
         self.survey_id = survey.survey_id
-        @log.debug sprintf("extracted survey id %s from survey %s", self.survey_id, survey)
 
         # get the custom_variable_label from the survey
         cvars = {}
         survey.custom_variables.each do |cvar|
           cvars.store(cvar.fetch('question_id'), cvar.fetch('variable_label'))
         end
-        @log.debug sprintf("extracted cvars '%s' from survey %s", cvars.inspect, survey)
         self.custom_variable_label=cvars.fetch(self.question_id, '')
-        @log.debug sprintf("custom_variable_label is '%s'", self.custom_variable_label)
 
       rescue StandardError => e
-        @log.error sprintf("initialization failed: %s", e.message)
         raise e
       end
     end
@@ -506,10 +494,8 @@ module MonkeyBusiness
 
         # get the question_id from the question
         self.question_id = question.question_id
-        @log.debug sprintf("extracted question id %s from question %s", self.question_id, question)
 
       rescue StandardError => e
-        @log.error sprintf("initialization failed: %s", e.message)
         raise e
       end
     end
@@ -561,23 +547,17 @@ module MonkeyBusiness
 
         # get a whole bunch of stuff from other places
         self.survey_id = survey.survey_id
-        @log.debug sprintf("extracted survey id %s from survey %s", self.survey_id, survey)
 
         self.question_id = question
-        @log.debug sprintf("question id is %s", question)
 
         self.userid = respondent.respondent_id
-        @log.debug sprintf("extracted respondent id %s from respondent %s", self.userid, respondent)
 
         self.custom_id = respondent.custom_id
-        @log.debug sprintf("extracted custom id %s from respondent %s", self.custom_id, respondent)
 
         newest_date = respondent.date_modified ? respondent.date_modified : respondent.date_start
         self.response_time = newest_date
-        @log.debug sprintf("extracted response time '%s' from respondent %s", self.response_time, respondent)
 
       rescue StandardError => e
-        @log.error sprintf("initialization failed: %s", e.message)
         raise e
       end
     end

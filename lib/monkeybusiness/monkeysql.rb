@@ -45,7 +45,6 @@ module MonkeyBusiness
         begin
           target_name = target.name
 
-          @log.info sprintf("%s: importing %s for survey_id %s", __method__, target_name, survey_id)
 
           s3_path = build_s3_path(bucket, key)
 
@@ -61,7 +60,6 @@ module MonkeyBusiness
           table = target.default_table
 
           if clobber
-            @log.info sprintf("%s: clobbering existing %s rows matching survey_id %s", __method__, table, survey_id)
             self.sequel.transaction do
               ds = self.sequel[delete_query, :survey_id => survey_id].delete
             end
@@ -70,11 +68,9 @@ module MonkeyBusiness
           self.sequel.fetch(copy_query, :s3_path => s3_path, :credentials => credentials, :delimiter => delimiter, :timeformat => timeformat).all
 
         rescue KeyError => e
-          @log.error sprintf("%s: no query found for class '%s'", __method__, target_name)
           raise e
 
         rescue StandardError => e
-          @log.error sprintf("%s: error: %s", __method__, e.message)
           raise e
 
         end
@@ -84,14 +80,12 @@ module MonkeyBusiness
 
       def build_s3_path(bucket, key)
         s3_path = sprintf("s3://%s/%s", bucket, key)
-        @log.debug sprintf("%s: s3_path: %s", __method__, s3_path)
 
         s3_path
       end
 
       def build_credentials(access_key, secret_key)
         credentials = sprintf("aws_access_key_id=%s;aws_secret_access_key=%s", access_key, secret_key)
-        @log.debug sprintf("%s: credentials: %s", __method__, credentials)
 
         credentials
       end
@@ -121,12 +115,10 @@ module MonkeyBusiness
 
           merged_params = default_params.merge(connection_params)
 
-          @log.debug sprintf("initializing with '%s' (%s)", connection_string, merged_params.inspect)
 
           @sequel = Sequel.connect(connection_string, merged_params)
 
         rescue StandardError => e
-          @log.error sprintf("unable to initialize: %s", e.message)
           raise e
         end
       end
