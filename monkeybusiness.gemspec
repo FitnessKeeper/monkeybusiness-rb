@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "aws-sdk", "~> 2"
   spec.add_runtime_dependency "hashie", "~> 3.4"
+  spec.add_runtime_dependency "jdbc-postgresql", "~> 9"
   spec.add_runtime_dependency "logging", "~> 2"
   spec.add_runtime_dependency "sequel", "~> 4"
   spec.add_runtime_dependency "surveymonkey", "~> 0.4"
