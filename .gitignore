@@ -1,3 +1,5 @@
+/*.jar
+/*.war
 /.bundle/
 /.env
 /.yardoc
@@ -7,4 +9,3 @@
 /pkg/
 /spec/reports/
 /tmp/
-
