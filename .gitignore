@@ -1,5 +1,7 @@
 /.bundle/
 /.env
+/*.jar
+/*.war
 /.ruby-version
 /.yardoc
 /_yardoc/
