@@ -10,5 +10,6 @@ gem 'surveymonkey', '~> 0.4'
 gem 'timeliness', '~> 0.3'
 
 group :jruby do
-  gem  'jdbc-postgres', '~> 9.4'
+  gem 'jruby-jars', '~> 1.7'
+  gem 'jdbc-postgres', '~> 9.4'
 end
