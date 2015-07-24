@@ -1,6 +1,7 @@
 require 'aws-sdk'
 require 'csv'
 require 'date'
+require 'erb'
 require 'hashie'
 require 'logging'
 require 'pp'
@@ -13,6 +14,7 @@ require 'zlib'
 require 'monkeybusiness/components'
 require 'monkeybusiness/worker'
 require 'monkeybusiness/version'
+require 'monkeybusiness/api'
 
 module MonkeyBusiness
   def self.run(survey_id, initial = false, target_questions = [], target_respondents = [], s3_prefix = 'monkeybusiness')
@@ -49,7 +51,7 @@ module MonkeyBusiness
     end
   end
 
-  def self.get_surveys
+  def self.get_surveys(surveys = nil)
     begin
       Surveymonkey.get_survey_list.fetch('data', {}).fetch('surveys', [])
     rescue StandardError => e

@@ -1,11 +1,6 @@
-#!/usr/bin/env ruby
-
-require "bundler/setup"
-
-require "dotenv"
+require 'dotenv'
 Dotenv.load
 
-# add /usr/src/app to $LOAD_PATH
 loaddirs = [
   ['/usr', 'src', 'app', 'lib'],
   ['.', 'lib'],
@@ -16,7 +11,6 @@ loaddirs.each do |path|
   $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 end
 
-require "monkeybusiness"
+require 'monkeybusiness'
 
-require "pry"
-Pry.start
+run MonkeyBusiness::API.new

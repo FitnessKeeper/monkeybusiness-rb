@@ -1,0 +1,19 @@
+[Unit]
+Description=Run monkeybusiness-api
+After=monkeybusiness-redis.service
+Requires=monkeybusiness-redis.service
+
+[Service]
+Restart=always
+RestartSec=30s
+ExecStartPre=-/usr/bin/docker pull fitnesskeeper/monkeybusiness-api:coreos
+ExecStartPre=-/usr/bin/docker kill monkeybusiness-api
+ExecStartPre=-/usr/bin/docker rm monkeybusiness-api
+ExecStart=/usr/bin/docker run -t -e RACK_ENV=development -p 9090:9090 --name monkeybusiness-api --link monkeybusiness-redis fitnesskeeper/monkeybusiness:coreos
+ExecStop=/usr/bin/docker stop monkeybusiness-api
+
+[X-Fleet]
+X-ConditionMachineOf=monkeybusiness-redis.service
+
+[Install]
+WantedBy=local.target

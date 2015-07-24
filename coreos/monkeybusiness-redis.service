@@ -1,0 +1,14 @@
+[Unit]
+Description=Run monkeybusiness-redis
+
+[Service]
+Restart=always
+RestartSec=30s
+ExecStartPre=-/usr/bin/docker kill monkeybusiness-redis
+ExecStartPre=-/usr/bin/docker rm monkeybusiness-redis
+ExecStartPre=/usr/bin/docker pull redis:2
+ExecStart=/usr/bin/docker run -t -p 6379 --name monkeybusiness-redis redis:2
+ExecStop=/usr/bin/docker stop monkeybusiness-redis
+
+[Install]
+WantedBy=local.target

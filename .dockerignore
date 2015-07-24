@@ -1,0 +1,5 @@
+.git
+coreos
+dotenv-sample
+Dockerfile
+*.gemspec

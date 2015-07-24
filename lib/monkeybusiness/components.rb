@@ -329,6 +329,9 @@ module MonkeyBusiness
       begin
         @log = Logging.logger[self]
 
+        # make sure our Boto config is in place
+        MonkeyBusiness::MonkeyAWS.genconfig
+
         basename = File.basename(outfile)
         key = File.join(prefix, basename).concat('.gz')
 

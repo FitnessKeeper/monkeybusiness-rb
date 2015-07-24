@@ -1,4 +1,4 @@
-# Monkeybusiness
+# MonkeyBusiness
 
 This gem contains the SurveyMonkey import worker, for use in RunKeeper ETL.  This code can operate independently of other code in the existing ETL codebase; as such, you can run this just as well from your workstation as from the production ETL system.
 
@@ -23,6 +23,14 @@ __NOTE__ You will have to install the appropriate DB driver for your platform!
 From your local Git repository, run `bin/setup` to install the gem's dependencies and see a sample application configuration.  Write this configuration in `.env` in the top level of the repository.
 
 Install the `sequel_pg` gem (`gem install sequel_pg`) and configure `REDSHIFT_DRIVER=postgres`.
+
+### Docker
+
+Alternately, you can build a Docker image from the provided Dockerfile.  Once you have a functional Docker environment (instructions for building one are beyond the scope of this document), run
+
+    $ docker build -t monkeybusiness .
+
+This will create a Docker image called "monkeybusiness" in your environment, with all prerequisites installed.  **NOTE**: make sure that you have populated your `.env` file with your credentials before you build the image!  These credentials will be hard-coded into the image; don't push the image to a public repository.
 
 ### Ruby
 
@@ -53,6 +61,15 @@ Run `bin/console` to get an interactive prompt; you can then invoke the runner a
 
     Frame number: 0/0
     [1] pry(main)>
+
+### Docker
+
+Alternately, if you have built the Docker image as documented above, run
+
+    $ docker run -it --name monkeybusiness-console monkeybusiness
+    [1] pry(main)>
+
+This will create a Docker container called "monkeybusiness-console" based on the "monkeybusiness" container you created earlier, and drop you into an interactive console.
 
 ### Ruby
 

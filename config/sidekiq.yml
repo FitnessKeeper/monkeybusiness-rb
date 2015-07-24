@@ -1,0 +1,6 @@
+---
+:concurrency: 1
+development:
+    :verbose: true
+production:
+    :verbose: false

@@ -1,4 +1,6 @@
 export MONKEYBUSINESS_LOGFILE='/tmp/monkeybusiness.log'
+export MONKEYBUSINESS_REDIS_URL='redis://localhost:6379/0'
+export REDIS_PROVIDER=MONKEYBUSINESS_REDIS_URL
 
 export SURVEYMONKEY_APIKEY='<SurveyMonkey API key>'
 export SURVEYMONKEY_ACCESSTOKEN='<SurveyMonkey API access token'

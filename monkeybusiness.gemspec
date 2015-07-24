@@ -29,6 +29,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "aws-sdk", "~> 2"
+  spec.add_runtime_dependency "sidekiq", "~> 3.4"
+  spec.add_runtime_dependency "grape", "~> 0.12"
   spec.add_runtime_dependency "hashie", "~> 3.4"
   spec.add_runtime_dependency "logging", "~> 2"
   spec.add_runtime_dependency "pg", "~> 0.18"
@@ -39,6 +41,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "dotenv", "~> 2"
+  spec.add_development_dependency "fig2coreos", "~> 0.1"
   spec.add_development_dependency "pry", "~> 0.10"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec"
