@@ -18,7 +18,6 @@ end
 
 group :development do
   gem 'bundler', '~> 1.10'
-  gem 'fig2coreos', '~> 0.1'
   gem 'pry', '~> 0.10'
   gem 'rake', '~> 10.0'
   gem 'rspec'

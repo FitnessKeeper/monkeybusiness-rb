@@ -1,10 +1,10 @@
-api:
-    image: fitnesskeeper/monkeybusiness:coreos
+monkeybusiness-api:
+    image: fitnesskeeper/monkeybusiness:compose
     ports:
         - "9090:9090"
     links:
-        - redis
-redis:
+        - monkeybusiness-redis
+monkeybusiness-redis:
     image: redis:2
     ports:
         - "6379"

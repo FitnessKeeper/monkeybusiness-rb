@@ -30,7 +30,6 @@ GEM
     diff-lcs (1.2.5)
     dotenv (2.0.2)
     equalizer (0.0.11)
-    fig2coreos (0.1.6)
     grape (0.12.0)
       activesupport
       builder
@@ -128,7 +127,6 @@ DEPENDENCIES
   aws-sdk (~> 2)
   bundler (~> 1.10)
   dotenv (~> 2)
-  fig2coreos (~> 0.1)
   grape (~> 0.12)
   hashie (~> 3.4)
   logging (~> 2)
