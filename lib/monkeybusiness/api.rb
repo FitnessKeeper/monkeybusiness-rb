@@ -24,12 +24,29 @@ module MonkeyBusiness
     format :json
     default_format :json
 
+    rescue_from :all
+
     helpers do
       def log
         API.logger
       end
     end
 
+    # authentication
+    begin
+      apiuser = ENV['MONKEYBUSINESS_USER']
+      apipassword = ENV['MONKEYBUSINESS_PASSWORD']
+
+    rescue StandardError => e
+      log.error(sprintf('%s: MONKEYBUSINESS_USER and/or MONKEYBUSINESS_PASSWORD not set', __method__))
+      raise e
+    end
+
+    http_basic do |username, password|
+      { apiuser => apipassword }[username] == password
+    end
+
+    # methods
     post '/perform' do
       log.debug(sprintf('%s: params: %s', __method__, params.inspect))
       log.debug(sprintf('%s: enqueueing delayed job', __method__))

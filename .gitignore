@@ -1,5 +1,5 @@
 /.bundle/
-/.env
+/.env*
 /*.jar
 /*.war
 /.ruby-version

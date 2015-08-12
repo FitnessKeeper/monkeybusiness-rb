@@ -1,4 +1,5 @@
 monkeybusiness-api:
+    env_file: ./.env-compose
     image: fitnesskeeper/monkeybusiness:compose
     ports:
         - "9090:9090"

@@ -6,7 +6,7 @@ APPPORT='9090'
 cd ${APPDIR}
 
 # start Sidekiq
-bundle exec sidekiq -r ./lib/monkeybusiness/scheduler.rb &
+bundle exec sidekiq -r ./lib/monkeybusiness/scheduler.rb -e ${RACK_ENV} &
 
 # start Unicorn
-bundle exec unicorn -p ${APPPORT}
+bundle exec unicorn -p ${APPPORT} -e ${RACK_ENV}
