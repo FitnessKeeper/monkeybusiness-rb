@@ -2,6 +2,10 @@
 
 set -o nounset
 
+if [ -r .env ]; then
+  . .env
+fi
+
 APPDIR=${MONKEYBUSINESS_APPDIR}
 APPPORT=${MONKEYBUSINESS_APPPORT}
 
