@@ -65,7 +65,6 @@ module MonkeyBusiness
         super(attributes, &block)
 
         @log = Logging.logger[self]
-        @log.level = :debug
 
       rescue StandardError => e
         raise e
@@ -141,7 +140,6 @@ module MonkeyBusiness
         super(attributes, &block)
 
         @log = Logging.logger[self]
-        @log.level = :warn
 
         @log.debug(sprintf("%s", self.inspect))
       rescue StandardError => e
@@ -162,7 +160,6 @@ module MonkeyBusiness
         super(attributes, &block)
 
         @log = Logging.logger[self]
-        @log.level = :debug
 
         @log.debug(sprintf("%s: %i respondents", self.survey, respondents.length))
       rescue StandardError => e

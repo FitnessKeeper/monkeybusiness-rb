@@ -51,9 +51,19 @@ module MonkeyBusiness
     end
   end
 
-  def self.get_surveys(surveys = nil)
+  def self.get_surveys(title = nil, detail = nil)
     begin
-      Surveymonkey.get_survey_list.fetch('data', {}).fetch('surveys', [])
+      if detail
+        method_params = {'fields' => ['title','date_created','date_modified','question_count','num_responses']}
+      else
+        method_params = {}
+      end
+
+      if title
+        method_params.merge!({'title' => title})
+      end
+
+      Surveymonkey.get_survey_list(method_params).fetch('data', {}).fetch('surveys', [])
     rescue StandardError => e
       raise e
     end

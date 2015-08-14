@@ -53,10 +53,11 @@ module MonkeyBusiness
 
       # set per-class logging
       Logging.logger['MonkeyBusiness::API'].level                     = :debug
-      Logging.logger['MonkeyBusiness::SurveyRow'].level               = :debug
-      Logging.logger['MonkeyBusiness::SurveyQuestionRow'].level       = :debug
-      Logging.logger['MonkeyBusiness::SurveyResponseOptionRow'].level = :debug
-      Logging.logger['MonkeyBusiness::SurveyResponseRow'].level       = :debug
+      Logging.logger['MonkeyBusiness::SurveyRow'].level               = :error
+      Logging.logger['MonkeyBusiness::SurveyQuestionRow'].level       = :error
+      Logging.logger['MonkeyBusiness::SurveyResponseOptionRow'].level = :error
+      Logging.logger['MonkeyBusiness::SurveyResponseRow'].level       = :error
+      Logging.logger['MonkeyBusiness::MonkeyAWS'].level               = :debug
       Logging.logger['MonkeyBusiness::MonkeyAWS::S3Client'].level     = :debug
       Logging.logger['MonkeyBusiness::MonkeySQL::DBClient'].level     = :debug
 
