@@ -6,7 +6,6 @@ Requires=monkeybusiness-redis.service
 [Service]
 Restart=always
 RestartSec=30s
-EnvironmentFile=/usr/src/app/.env
 ExecStartPre=-/usr/bin/docker pull fitnesskeeper/monkeybusiness-api:coreos
 ExecStartPre=-/usr/bin/docker kill monkeybusiness-api
 ExecStartPre=-/usr/bin/docker rm monkeybusiness-api
