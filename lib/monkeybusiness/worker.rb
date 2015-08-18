@@ -21,20 +21,21 @@ module MonkeyBusiness
 
     def get_survey_details(survey_id = self.survey_id)
       begin
+        log = Logging.logger[__method__]
+
         response = Surveymonkey.get_survey_details({'method_params' => survey_id})
 
         if response['status'] == 0
           MonkeyBusiness::Survey.new(response.fetch('data'))
         end
       rescue StandardError => e
-        binding.pry
+        log.error(sprintf('%s: %s', __method__, e.message))
         raise e
       end
     end
 
     def get_responses(survey, respondents)
-      @log = Logging.logger[__method__]
-      @log.level = :debug
+      log = Logging.logger[__method__]
 
       respondent_list = respondents.respondents.clone
       responses = []

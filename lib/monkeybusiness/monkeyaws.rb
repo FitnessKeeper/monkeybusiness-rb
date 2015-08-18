@@ -32,7 +32,6 @@ module MonkeyBusiness
 
       rescue StandardError => e
         @log.error(sprintf('%s: %s', __method__, e.message))
-        binding.pry
         raise e
       end
     end

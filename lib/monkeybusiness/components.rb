@@ -364,7 +364,7 @@ module MonkeyBusiness
         db.import_from_s3(self, survey_id, bucket, key, clobber)
 
       rescue StandardError => e
-        binding.pry
+        @log.error(sprintf('%s: DB import error: %s', __method__, e.message))
         raise e
       end
     end
