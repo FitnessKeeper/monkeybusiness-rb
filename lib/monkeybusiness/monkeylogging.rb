@@ -53,6 +53,7 @@ module MonkeyBusiness
 
       # set per-class logging
       Logging.logger['MonkeyBusiness::API'].level                     = :debug
+      Logging.logger['MonkeyBusiness::APIWorker'].level               = :debug
       Logging.logger['MonkeyBusiness::SurveyRow'].level               = :error
       Logging.logger['MonkeyBusiness::SurveyQuestionRow'].level       = :error
       Logging.logger['MonkeyBusiness::SurveyResponseOptionRow'].level = :error
