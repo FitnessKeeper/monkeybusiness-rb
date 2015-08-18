@@ -16,17 +16,24 @@ module MonkeyBusiness
 
         boto_config = <<-BOTO.gsub(/^\s+/, '')
         [Credentials]
-        aws_access_key_id = <%= access_key %>
-        aws_secret_access_key = <%= secret_key %>
+        aws_access_key_id = <%= @access_key %>
+        aws_secret_access_key = <%= @secret_key %>
 
         BOTO
-        config = ERB.new(boto_config).result
 
-        configfile = File.join(ENV['HOME'], '.boto')
+        # oh, Ruby variable scope
+        Array(boto_config).each do |template|
+          @access_key = access_key
+          @secret_key = secret_key
+          boto_binding = binding()
+          config = ERB.new(boto_config).result(boto_binding)
 
-        unless File.exist?(configfile)
-          File.open(configfile, 'w') do |cf|
-            cf << config
+          configfile = File.join(ENV['HOME'], '.boto')
+
+          unless File.exist?(configfile)
+            File.open(configfile, 'w') do |cf|
+              cf << config
+            end
           end
         end
 
