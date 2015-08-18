@@ -6,7 +6,6 @@ if [ -r .env ]; then
   # really?? really :(
   sed -e 's/^/export /' .env > .env-export
   . .env-export
-  env
 fi
 
 APPDIR=${MONKEYBUSINESS_APPDIR}
