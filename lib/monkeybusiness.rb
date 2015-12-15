@@ -6,7 +6,6 @@ require 'hashie'
 require 'logging'
 require 'pp'
 require 'pry'
-require 'sequel'
 require 'surveymonkey'
 require 'timeliness'
 require 'zlib'
@@ -35,16 +34,6 @@ module MonkeyBusiness
       MonkeyBusiness::SurveyQuestionRow.upload(prefixed_path)
       MonkeyBusiness::SurveyResponseOptionRow.upload(prefixed_path)
       MonkeyBusiness::SurveyResponseRow.upload(prefixed_path)
-
-      # import to Redshift
-      connection_params = { client_min_messages: false, force_standard_strings: false }
-      MonkeyBusiness::SurveyResponseRow.dbimport(survey_id, prefixed_path, connection_params)
-
-      if initial
-        MonkeyBusiness::SurveyRow.dbimport(survey_id, prefixed_path, connection_params)
-        MonkeyBusiness::SurveyQuestionRow.dbimport(survey_id, prefixed_path, connection_params, false)
-        MonkeyBusiness::SurveyResponseOptionRow.dbimport(survey_id, prefixed_path, connection_params)
-      end
 
     rescue StandardError => e
       raise e
