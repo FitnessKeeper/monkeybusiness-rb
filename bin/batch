@@ -19,7 +19,7 @@ end
 require "monkeybusiness"
 
 begin
-  ENV['SURVEYS'].split(',') do |survey|
+  ENV['SURVEYS'].split(',').each do |survey|
     MonkeyBusiness.run(survey)
   end
 
