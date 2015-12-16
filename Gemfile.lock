@@ -59,7 +59,6 @@ GEM
     minitest (5.7.0)
     multi_json (1.11.2)
     multi_xml (0.5.5)
-    pg (0.18.2)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -87,10 +86,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
-    sequel (4.24.0)
-    sequel_pg (1.6.13)
-      pg (>= 0.8.0)
-      sequel (>= 3.39.0)
     sidekiq (3.4.2)
       celluloid (~> 0.16.0)
       connection_pool (~> 2.2, >= 2.2.0)
@@ -130,16 +125,13 @@ DEPENDENCIES
   grape (~> 0.12)
   hashie (~> 3.4)
   logging (~> 2)
-  pg (~> 0.18)
   pry (~> 0.10)
   rake (~> 10.0)
   rspec
-  sequel (~> 4)
-  sequel_pg (~> 1.6)
   sidekiq (~> 3.4)
   surveymonkey (~> 0.4)
   timeliness (~> 0.3)
   unicorn (~> 4.9)
 
 BUNDLED WITH
-   1.10.5
+   1.10.6

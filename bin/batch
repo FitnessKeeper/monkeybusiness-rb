@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+
+require "dotenv"
+Dotenv.load
+
+# add /usr/src/app to $LOAD_PATH
+loaddirs = [
+  ['/usr', 'src', 'app', 'lib'],
+  ['.', 'lib'],
+]
+
+loaddirs.each do |path|
+  libdir = File.join(path)
+  $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
+end
+
+require "monkeybusiness"
+
+begin
+  ENV['SURVEYS'].split(',') do |survey|
+    MonkeyBusiness.run(survey)
+  end
+
+rescue NoMethodError => e
+  warn "must set the $SURVEYS environment variable first"
+  raise e
+
+rescue StandardError => e
+  raise e
+end
